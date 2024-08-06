@@ -1,6 +1,5 @@
 package domain.usecase
 
-import domain.enums.PRRole
 import domain.enums.PRStatus
 import domain.repository.SourceCodeRepository
 
@@ -11,6 +10,5 @@ internal class GetListPullRequest(
         projectKey: String?,
         repoName: String?,
         prStatus: String? = PRStatus.OPEN.get()
-    ) =
-        repository.getListPullRequest(projectKey = projectKey, repoName = repoName, prStatus = prStatus)
+    ) = repository.getListPullRequest(projectKey = projectKey, repoName = repoName, prStatus = prStatus)
 }
