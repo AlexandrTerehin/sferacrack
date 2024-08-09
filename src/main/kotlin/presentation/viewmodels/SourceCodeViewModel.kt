@@ -6,7 +6,7 @@ import core.consts.ProjectKeysConsts
 import core.consts.UrlConsts
 import core.settings.SferaSetting
 import domain.models.PullRequest
-import domain.usecase.GetListPullRequest
+import domain.usecase.GetListPullRequestUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ import java.awt.Desktop
 import java.net.URI
 
 internal class SourceCodeViewModel(
-    private val getListPullRequest: GetListPullRequest
+    private val getListPullRequest: GetListPullRequestUseCase
 ) : ViewModel() {
 
     private val user = SferaSetting.getUser()
@@ -54,7 +54,7 @@ internal class SourceCodeViewModel(
             cachePullRequest?.let { cache ->
                 if (author) {
                     _flowPullRequest.emit(cache.filter {
-                        userLoginEquals(it.authorLogin)
+                        userLoginEquals(it.authorLogin) == true
                     })
                 } else {
                     _flowPullRequest.emit(cache)
@@ -71,7 +71,7 @@ internal class SourceCodeViewModel(
             cachePullRequest?.let { cache ->
                 if (reviewer) {
                     _flowPullRequest.emit(cache.filter { pr ->
-                        pr.reviewers?.any { reviewerPR -> userLoginEquals(reviewerPR.login) } == true
+                        pr.reviewers?.any { reviewerPR -> userLoginEquals(reviewerPR.login) == true } == true
                     })
                 } else {
                     _flowPullRequest.emit(cache)
@@ -80,7 +80,7 @@ internal class SourceCodeViewModel(
         }
     }
 
-    private fun userLoginEquals(login: String?) = user.login.lowercase().startsWith(login?.lowercase().orEmpty())
+    private fun userLoginEquals(login: String?) = user?.login?.lowercase()?.startsWith(login?.lowercase().orEmpty())
 
     private fun getLink(pullRequest: PullRequest) =
         "${UrlConsts.SFERA}sourcecode/projects/${ProjectKeysConsts.PROJECT_KEY_ANDROID}/repos/${ProjectKeysConsts.REPO_NAME_ANDROID}/pulls/${pullRequest.id}"

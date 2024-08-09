@@ -3,7 +3,7 @@ package domain.usecase
 import domain.enums.PRStatus
 import domain.repository.SourceCodeRepository
 
-internal class GetListPullRequest(
+internal class GetListPullRequestUseCase(
     private val repository: SourceCodeRepository
 ) {
     suspend operator fun invoke(
