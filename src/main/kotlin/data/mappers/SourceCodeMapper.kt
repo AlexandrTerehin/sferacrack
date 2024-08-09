@@ -8,7 +8,7 @@ import domain.models.Reviewer
 internal class SourceCodeMapper {
     fun toDomain(dto: SourceCodePullRequestDto): List<PullRequest> {
         return dto.data.map {
-            PullRequest(
+            PullRequest.Success(
                 id = it.id,
                 authorLogin = it.author.login,
                 authorEmail = it.author.email,

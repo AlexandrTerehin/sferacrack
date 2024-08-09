@@ -10,4 +10,6 @@ internal interface SourceCodeRepository {
         prStatus: String?,
         cache: Boolean
     ): List<PullRequest>
+
+    suspend fun isAuthorization(): Boolean
 }

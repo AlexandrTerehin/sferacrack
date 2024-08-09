@@ -25,7 +25,7 @@ import uikit.states.SIconState
 
 @Composable
 internal fun SourceCodeScreen(
-    viewModel: SourceCodeViewModel = viewModel()
+    viewModel: SourceCodeViewModel = viewModel(factory = SourceCodeViewModel.Factory)
 ) {
     PullRequestView(
         pullRequetsState = viewModel.flowPullRequest.collectAsState(emptyList()),
@@ -35,18 +35,16 @@ internal fun SourceCodeScreen(
         onSwitchReviewer = viewModel::switchReviewer,
         onClickPullRequest = viewModel::openPullRequest
     )
-
-    viewModel.init()
 }
 
 @Composable
 private fun PullRequestView(
-    pullRequetsState: State<List<PullRequest>>,
+    pullRequetsState: State<List<PullRequest.Success>>,
     authorState: State<Boolean>,
     reviewerState: State<Boolean>,
     onSwitchAuthor: () -> Unit,
     onSwitchReviewer: () -> Unit,
-    onClickPullRequest: (PullRequest) -> Unit
+    onClickPullRequest: (PullRequest.Success) -> Unit
 ) {
     MaterialTheme {
         Column {

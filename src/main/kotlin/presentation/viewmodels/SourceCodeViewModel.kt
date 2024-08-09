@@ -1,10 +1,13 @@
 package presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import core.consts.ProjectKeysConsts
 import core.consts.UrlConsts
 import core.settings.SferaSetting
+import domain.di.DomainDI
 import domain.models.PullRequest
 import domain.usecase.GetListPullRequestUseCase
 import kotlinx.coroutines.Dispatchers
@@ -15,13 +18,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.awt.Desktop
 import java.net.URI
+import kotlin.reflect.KClass
 
 internal class SourceCodeViewModel(
     private val getListPullRequest: GetListPullRequestUseCase
 ) : ViewModel() {
 
-    private val user = SferaSetting.getUser()
-    private var cachePullRequest: List<PullRequest>? = null
+    private var cachePullRequest: List<PullRequest.Success>? = null
 
     private val _authorState = MutableStateFlow(false)
     val authorState = _authorState.asStateFlow()
@@ -29,20 +32,24 @@ internal class SourceCodeViewModel(
     private val _reviewerState = MutableStateFlow(false)
     val reviewerState = _reviewerState.asStateFlow()
 
-    private val _flowPullRequest = MutableSharedFlow<List<PullRequest>>()
+    private val _flowPullRequest = MutableSharedFlow<List<PullRequest.Success>>()
     val flowPullRequest = _flowPullRequest.asSharedFlow()
 
-    fun init() {
+    init {
+        _count += 1
+        println("count = $_count")
         viewModelScope.launch(Dispatchers.IO) {
             cachePullRequest =
                 getListPullRequest(ProjectKeysConsts.PROJECT_KEY_ANDROID, ProjectKeysConsts.REPO_NAME_ANDROID)
+                    .map { it as PullRequest.Success }
+
             cachePullRequest?.let {
                 _flowPullRequest.emit(it)
             }
         }
     }
 
-    fun openPullRequest(pullRequest: PullRequest) {
+    fun openPullRequest(pullRequest: PullRequest.Success) {
         Desktop.getDesktop().browse(URI(getLink(pullRequest = pullRequest)))
     }
 
@@ -80,8 +87,20 @@ internal class SourceCodeViewModel(
         }
     }
 
-    private fun userLoginEquals(login: String?) = user?.login?.lowercase()?.startsWith(login?.lowercase().orEmpty())
+    private fun userLoginEquals(login: String?) =
+        SferaSetting.user?.login?.lowercase()?.startsWith(login?.lowercase().orEmpty())
 
-    private fun getLink(pullRequest: PullRequest) =
+    private fun getLink(pullRequest: PullRequest.Success) =
         "${UrlConsts.SFERA}sourcecode/projects/${ProjectKeysConsts.PROJECT_KEY_ANDROID}/repos/${ProjectKeysConsts.REPO_NAME_ANDROID}/pulls/${pullRequest.id}"
+
+    companion object {
+        private var _count = 0
+
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: KClass<T>, extras: CreationExtras): T {
+                return SourceCodeViewModel(getListPullRequest = DomainDI.getListPullRequest()) as T
+            }
+        }
+    }
 }
