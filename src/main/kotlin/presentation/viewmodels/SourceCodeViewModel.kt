@@ -16,12 +16,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import presentation.mappers.ViewMapper
+import presentation.models.PullRequestModel
 import java.awt.Desktop
 import java.net.URI
 import kotlin.reflect.KClass
 
 internal class SourceCodeViewModel(
-    private val getListPullRequest: GetListPullRequestUseCase
+    private val getListPullRequest: GetListPullRequestUseCase,
+    private val viewMapper: ViewMapper
 ) : ViewModel() {
 
     private var cachePullRequest: List<PullRequest.Success>? = null
@@ -32,7 +35,7 @@ internal class SourceCodeViewModel(
     private val _reviewerState = MutableStateFlow(false)
     val reviewerState = _reviewerState.asStateFlow()
 
-    private val _flowPullRequest = MutableSharedFlow<List<PullRequest.Success>>()
+    private val _flowPullRequest = MutableSharedFlow<List<PullRequestModel>>()
     val flowPullRequest = _flowPullRequest.asSharedFlow()
 
     init {
@@ -44,12 +47,12 @@ internal class SourceCodeViewModel(
                     .map { it as PullRequest.Success }
 
             cachePullRequest?.let {
-                _flowPullRequest.emit(it)
+                _flowPullRequest.emit(viewMapper.toUI(it))
             }
         }
     }
 
-    fun openPullRequest(pullRequest: PullRequest.Success) {
+    fun openPullRequest(pullRequest: PullRequestModel) {
         Desktop.getDesktop().browse(URI(getLink(pullRequest = pullRequest)))
     }
 
@@ -60,11 +63,12 @@ internal class SourceCodeViewModel(
             _authorState.emit(author)
             cachePullRequest?.let { cache ->
                 if (author) {
-                    _flowPullRequest.emit(cache.filter {
+                    val result = cache.filter {
                         userLoginEquals(it.authorLogin) == true
-                    })
+                    }
+                    _flowPullRequest.emit(viewMapper.toUI(result))
                 } else {
-                    _flowPullRequest.emit(cache)
+                    _flowPullRequest.emit(viewMapper.toUI(cache))
                 }
             }
         }
@@ -77,11 +81,12 @@ internal class SourceCodeViewModel(
             _reviewerState.emit(reviewer)
             cachePullRequest?.let { cache ->
                 if (reviewer) {
-                    _flowPullRequest.emit(cache.filter { pr ->
+                    val result = cache.filter { pr ->
                         pr.reviewers?.any { reviewerPR -> userLoginEquals(reviewerPR.login) == true } == true
-                    })
+                    }
+                    _flowPullRequest.emit(viewMapper.toUI(result))
                 } else {
-                    _flowPullRequest.emit(cache)
+                    _flowPullRequest.emit(viewMapper.toUI(cache))
                 }
             }
         }
@@ -90,7 +95,7 @@ internal class SourceCodeViewModel(
     private fun userLoginEquals(login: String?) =
         SferaSetting.user?.login?.lowercase()?.startsWith(login?.lowercase().orEmpty())
 
-    private fun getLink(pullRequest: PullRequest.Success) =
+    private fun getLink(pullRequest: PullRequestModel) =
         "${UrlConsts.SFERA}sourcecode/projects/${ProjectKeysConsts.PROJECT_KEY_ANDROID}/repos/${ProjectKeysConsts.REPO_NAME_ANDROID}/pulls/${pullRequest.id}"
 
     companion object {
@@ -99,7 +104,10 @@ internal class SourceCodeViewModel(
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: KClass<T>, extras: CreationExtras): T {
-                return SourceCodeViewModel(getListPullRequest = DomainDI.getListPullRequest()) as T
+                return SourceCodeViewModel(
+                    getListPullRequest = DomainDI.getListPullRequest(),
+                    viewMapper = ViewMapper()
+                ) as T
             }
         }
     }

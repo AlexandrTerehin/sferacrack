@@ -20,10 +20,16 @@ internal sealed class PullRequest {
 
 internal data class Reviewer(
     val login: String?,
-    val decision: String?,
+    val decision: Decision,
     val email: String?,
     val firstName: String?,
     val lastName: String?,
     val middleName: String?,
     val principalName: String?,
 )
+
+internal enum class Decision(val key: String) {
+    APPROVE("approve"),
+    PENDING("pending"),
+    NULL("null")
+}
