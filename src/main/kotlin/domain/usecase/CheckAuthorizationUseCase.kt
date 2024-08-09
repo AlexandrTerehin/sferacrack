@@ -1,6 +1,9 @@
 package domain.usecase
 
-internal class CheckAuthorizationUseCase() {
-    // todo
-    suspend operator fun invoke() = true
+import domain.repository.SourceCodeRepository
+
+internal class CheckAuthorizationUseCase(
+    private val repository: SourceCodeRepository
+) {
+    suspend operator fun invoke() = repository.isAuthorization()
 }

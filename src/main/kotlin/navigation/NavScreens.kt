@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import domain.di.DomainDI
+import presentation.viewmodels.AuthorizationViewModel
 import presentation.viewmodels.SourceCodeViewModel
 import presentation.views.AuthorizationScreen
 import presentation.views.SourceCodeScreen
@@ -26,7 +27,7 @@ internal fun NavScreens(
             AuthorizationScreen(navHostController = navController)
         }
         composable(route = Screens.PULL_REQUESTS.name) {
-            SourceCodeScreen(viewModel = SourceCodeViewModel(getListPullRequest = DomainDI.getListPullRequest()))
+            SourceCodeScreen()
         }
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.ui.res.useResource
 import com.google.gson.Gson
 import data.datasource.SferaSourceCodeApi
 import data.mappers.SourceCodeMapper
+import data.models.PullRequestsResponse
 import data.models.SourceCodePullRequestDto
 import domain.models.PullRequest
 import domain.repository.SourceCodeRepository
@@ -19,11 +20,16 @@ internal class SourceCodeRepositoryImpl(
         prStatus: String?,
         cache: Boolean
     ): List<PullRequest> {
-        return mapper.toDomain(getTestData())
-        /*api.getListPullRequest(projectKey, repoName, prStatus, cache)?.let {
-            return mapper.toDomain(it)
-        } ?: return emptyList()*/
+        //return mapper.toDomain(getTestData())
+        api.getListPullRequest(projectKey, repoName, prStatus, cache).let {
+            return when (it) {
+                is PullRequestsResponse.Success -> mapper.toDomain(it.dto)
+                else -> emptyList()
+            }
+        }
     }
+
+    override suspend fun isAuthorization() = api.isAuthorization()
 
     // todo test data
     private fun getTestData(): SourceCodePullRequestDto {

@@ -15,14 +15,16 @@ fun OutlineInput(
     value: MutableState<String> = remember { mutableStateOf("") },
     onValueChange: (String) -> Unit = { value.value = it },
     singleLine: Boolean = true,
-    label: String = ""
+    label: String = "",
+    placeholder: String = ""
 ) {
     OutlinedTextField(
         modifier = modifier,
         value = value.value,
         onValueChange = onValueChange,
         singleLine = singleLine,
-        label = { Text(text = label) }
+        label = { Text(text = label) },
+        placeholder = { Text(text = placeholder) }
     )
 }
 
