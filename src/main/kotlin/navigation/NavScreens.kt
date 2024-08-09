@@ -8,7 +8,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import domain.di.DomainDI
+import presentation.viewmodels.SourceCodeViewModel
 import presentation.views.AuthorizationScreen
+import presentation.views.SourceCodeScreen
 
 @Composable
 internal fun NavScreens(
@@ -20,7 +23,10 @@ internal fun NavScreens(
         modifier = Modifier.fillMaxSize()
     ) {
         composable(route = Screens.AUTHORIZATION.name) {
-            AuthorizationScreen()
+            AuthorizationScreen(navHostController = navController)
+        }
+        composable(route = Screens.PULL_REQUESTS.name) {
+            SourceCodeScreen(viewModel = SourceCodeViewModel(getListPullRequest = DomainDI.getListPullRequest()))
         }
     }
 }

@@ -7,6 +7,7 @@ internal interface SourceCodeRepository {
     suspend fun getListPullRequest(
         projectKey: String?,
         repoName: String?,
-        prStatus: String?
+        prStatus: String?,
+        cache: Boolean
     ): List<PullRequest>
 }

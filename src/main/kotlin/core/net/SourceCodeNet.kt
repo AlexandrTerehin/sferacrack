@@ -17,7 +17,12 @@ internal class SourceCodeNet {
         }
 
     private val client = OkHttpClient.Builder()
-        .authenticator(SferaAuthenticator(SferaSetting.getUser().login, SferaSetting.getUser().password))
+        .authenticator(
+            SferaAuthenticator(
+                SferaSetting.getUser()?.login.orEmpty(),
+                SferaSetting.getUser()?.password.orEmpty()
+            )
+        )
         .addInterceptor(interceptor)
         .build()
 

@@ -15,8 +15,12 @@ internal class SferaSourceCodeApi(private val net: SourceCodeNet) {
     suspend fun getListPullRequest(
         projectKey: String?,
         repoName: String?,
-        prStatus: String?
+        prStatus: String?,
+        cache: Boolean,
     ): SourceCodePullRequestDto? {
+        if (cache && SourceCodeCache.pullRequestDto != null) {
+            return SourceCodeCache.pullRequestDto
+        }
         val service = net.get().create(PullRequestsService::class.java)
         return try {
             val pullRequest = service.listPullRequest(projectKey = projectKey, repoName = repoName, prStatus = prStatus)
