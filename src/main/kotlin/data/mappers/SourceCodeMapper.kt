@@ -2,6 +2,7 @@ package data.mappers
 
 import data.models.PullRequestDto
 import data.models.SourceCodePullRequestDto
+import domain.models.Decision
 import domain.models.PullRequest
 import domain.models.Reviewer
 
@@ -30,7 +31,8 @@ internal class SourceCodeMapper {
             reviewers.add(
                 Reviewer(
                     login = ass.login,
-                    decision = ass.decision,
+                    decision = ass.decision?.let { decision -> Decision.entries.singleOrNull { it.key == decision } }
+                        ?: Decision.NULL,
                     email = ass.email,
                     firstName = ass.firstName,
                     lastName = ass.lastName,
@@ -45,7 +47,8 @@ internal class SourceCodeMapper {
                 reviewers.add(
                     Reviewer(
                         login = ass.login,
-                        decision = ass.decision,
+                        decision = ass.decision?.let { decision -> Decision.entries.singleOrNull { it.key == decision } }
+                            ?: Decision.NULL,
                         email = ass.email,
                         firstName = ass.firstName,
                         lastName = ass.lastName,

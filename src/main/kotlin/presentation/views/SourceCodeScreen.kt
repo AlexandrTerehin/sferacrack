@@ -13,7 +13,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import domain.models.PullRequest
+import domain.models.Decision
+import presentation.models.PullRequestModel
 import presentation.viewmodels.SourceCodeViewModel
 import uikit.components.cells.IconProperty
 import uikit.components.cells.RowTitleSubtitleIconCell
@@ -39,12 +40,12 @@ internal fun SourceCodeScreen(
 
 @Composable
 private fun PullRequestView(
-    pullRequetsState: State<List<PullRequest.Success>>,
+    pullRequetsState: State<List<PullRequestModel>>,
     authorState: State<Boolean>,
     reviewerState: State<Boolean>,
     onSwitchAuthor: () -> Unit,
     onSwitchReviewer: () -> Unit,
-    onClickPullRequest: (PullRequest.Success) -> Unit
+    onClickPullRequest: (PullRequestModel) -> Unit
 ) {
     MaterialTheme {
         Column {
@@ -60,18 +61,20 @@ private fun PullRequestView(
 
             LazyColumn(modifier = Modifier.padding(top = d8), userScrollEnabled = true) {
                 item {
-                    pullRequetsState.value.forEach {
+                    pullRequetsState.value.forEach { prState ->
+                        val property = mutableListOf<IconProperty>()
+                        when (prState.decision) {
+                            Decision.APPROVE -> property.add(IconProperty(SIcon.APPROVE, SIconState.GOOD))
+                            else -> {}
+                        }
+
                         RowTitleSubtitleIconCell(
                             icon = SIcon.FAVORITE,
                             onClickIcon = { },
-                            onClick = { onClickPullRequest(it) },
-                            title = it.title.orEmpty(),
-                            subtitle = it.description.orEmpty(),
-                            property = listOf(
-                                IconProperty(SIcon.BUILD, SIconState.GOOD),
-                                IconProperty(SIcon.NEW_RELEASE, SIconState.BAD),
-                                IconProperty(SIcon.RELEASE_ALERT, SIconState.BAD)
-                            )
+                            onClick = { onClickPullRequest(prState) },
+                            title = prState.title,
+                            subtitle = prState.description,
+                            property = property
                         )
                         Divider(modifier = Modifier.fillMaxWidth().height(d4))
                     }

@@ -1,6 +1,9 @@
 package uikit.icons
 
 enum class SIcon {
+    APPROVE {
+        override val value = "icons/ic_24_approve.svg"
+    },
     NEW_RELEASE {
         override val value = "icons/ic_40_new_releases.svg"
     },
