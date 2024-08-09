@@ -14,12 +14,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import navigation.Screens
 import uikit.components.buttons.BaseButton
 import uikit.components.inputs.OutlineInput
 import uikit.dimens.d16
 
 @Composable
-internal fun AuthorizationScreen(modifier: Modifier = Modifier) {
+internal fun AuthorizationScreen(modifier: Modifier = Modifier, navHostController: NavHostController) {
     val login = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
@@ -37,7 +39,8 @@ internal fun AuthorizationScreen(modifier: Modifier = Modifier) {
                 OutlineInput(modifier = modifier, label = "password:", value = password)
                 OutlineInput(modifier = modifier, label = "email:", value = email)
                 BaseButton(modifier = modifier, onClick = {
-                    openAlert.value = true
+                    navHostController.navigate(route = Screens.PULL_REQUESTS.name)
+                    //openAlert.value = true
                 }, text = "Authorization")
             }
         }
@@ -60,5 +63,5 @@ internal fun AuthorizationScreen(modifier: Modifier = Modifier) {
 @Composable
 @Preview
 private fun AuthorizationsScreenPreview() {
-    AuthorizationScreen()
+    AuthorizationScreen(navHostController = NavHostController())
 }

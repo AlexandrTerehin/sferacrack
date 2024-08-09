@@ -9,6 +9,7 @@ internal class GetListPullRequestUseCase(
     suspend operator fun invoke(
         projectKey: String?,
         repoName: String?,
-        prStatus: String? = PRStatus.OPEN.get()
-    ) = repository.getListPullRequest(projectKey = projectKey, repoName = repoName, prStatus = prStatus)
+        prStatus: String? = PRStatus.OPEN.get(),
+        cache: Boolean = true,
+    ) = repository.getListPullRequest(projectKey = projectKey, repoName = repoName, prStatus = prStatus, cache = cache)
 }
